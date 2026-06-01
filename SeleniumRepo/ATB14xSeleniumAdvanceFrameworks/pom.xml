@@ -1,0 +1,246 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.thetestingacademy</groupId>
+  <artifactId>ATB14xSeleniumAdvanceFramework</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>ATB14xSeleniumAdvanceFramework</name>
+  <description>Enterprise-grade Selenium Test Automation Framework</description>
+  <url>https://github.com/thetestingacademy/ATB14xSeleniumAdvanceFramework</url>
+
+  <!-- ============================================ -->
+  <!-- Version Management - Centralized Versions   -->
+  <!-- ============================================ -->
+  <properties>
+    <!-- Build Settings -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+
+    <!-- Dependency Versions -->
+    <selenium.version>4.27.0</selenium.version>
+    <testng.version>7.10.2</testng.version>
+    <allure.version>2.29.0</allure.version>
+    <log4j.version>2.24.3</log4j.version>
+    <assertj.version>3.27.3</assertj.version>
+    <poi.version>5.3.0</poi.version>
+    <commons-io.version>2.18.0</commons-io.version>
+
+    <!-- Plugin Versions -->
+    <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
+    <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+    <allure-maven.version>2.14.0</allure-maven.version>
+
+    <!-- Test Configuration -->
+    <testng.suite.file>testng_vwo_retry_prop_improved_pom_part4.xml</testng.suite.file>
+    <thread.count>4</thread.count>
+    <parallel.mode>methods</parallel.mode>
+
+    <!-- Allure Configuration -->
+    <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+  </properties>
+
+  <dependencies>
+    <!-- ============================================ -->
+    <!-- Selenium WebDriver                          -->
+    <!-- ============================================ -->
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <version>${selenium.version}</version>
+    </dependency>
+
+    <!-- ============================================ -->
+    <!-- TestNG Framework                            -->
+    <!-- ============================================ -->
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>${testng.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- ============================================ -->
+    <!-- Assertions                                  -->
+    <!-- ============================================ -->
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>${assertj.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- ============================================ -->
+    <!-- Allure Reporting                            -->
+    <!-- ============================================ -->
+    <dependency>
+      <groupId>io.qameta.allure</groupId>
+      <artifactId>allure-testng</artifactId>
+      <version>${allure.version}</version>
+    </dependency>
+
+    <!-- ============================================ -->
+    <!-- Logging - Log4j2                            -->
+    <!-- ============================================ -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${log4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>${log4j.version}</version>
+    </dependency>
+
+    <!-- ============================================ -->
+    <!-- Apache POI - Excel Support                  -->
+    <!-- ============================================ -->
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi</artifactId>
+      <version>${poi.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml</artifactId>
+      <version>${poi.version}</version>
+    </dependency>
+
+    <!-- ============================================ -->
+    <!-- Commons IO - File Utilities                 -->
+    <!-- ============================================ -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>${commons-io.version}</version>
+    </dependency>
+  </dependencies>
+
+  <!-- ============================================ -->
+  <!-- Build Configuration                         -->
+  <!-- ============================================ -->
+  <build>
+    <plugins>
+      <!-- Maven Compiler Plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+        <configuration>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
+          <encoding>${project.build.sourceEncoding}</encoding>
+        </configuration>
+      </plugin>
+
+      <!-- Maven Surefire Plugin - Test Execution -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${maven-surefire-plugin.version}</version>
+        <configuration>
+          <!-- TestNG Suite File -->
+          <suiteXmlFiles>
+            <suiteXmlFile>${testng.suite.file}</suiteXmlFile>
+          </suiteXmlFiles>
+
+          <!-- Parallel Execution for 10,000+ tests -->
+          <parallel>${parallel.mode}</parallel>
+          <threadCount>${thread.count}</threadCount>
+          <perCoreThreadCount>true</perCoreThreadCount>
+
+          <!-- System Properties -->
+          <systemPropertyVariables>
+            <browser>${browser}</browser>
+            <headless>${headless}</headless>
+            <execution_mode>${execution_mode}</execution_mode>
+            <remote_url>${remote_url}</remote_url>
+            <allure.results.directory>${allure.results.directory}</allure.results.directory>
+          </systemPropertyVariables>
+
+          <!-- Argument Line for Memory -->
+          <argLine>-Xmx2048m -XX:+UseG1GC</argLine>
+
+          <!-- Test Failure Handling -->
+          <testFailureIgnore>false</testFailureIgnore>
+          <rerunFailingTestsCount>1</rerunFailingTestsCount>
+        </configuration>
+      </plugin>
+
+      <!-- Allure Maven Plugin - Report Generation -->
+      <plugin>
+        <groupId>io.qameta.allure</groupId>
+        <artifactId>allure-maven</artifactId>
+        <version>${allure-maven.version}</version>
+        <configuration>
+          <reportVersion>${allure.version}</reportVersion>
+          <resultsDirectory>${allure.results.directory}</resultsDirectory>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <!-- ============================================ -->
+  <!-- Build Profiles for Different Environments   -->
+  <!-- ============================================ -->
+  <profiles>
+    <!-- Local Execution Profile -->
+    <profile>
+      <id>local</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <execution_mode>local</execution_mode>
+        <headless>false</headless>
+        <browser>chrome</browser>
+      </properties>
+    </profile>
+
+    <!-- CI/CD Headless Profile -->
+    <profile>
+      <id>ci</id>
+      <properties>
+        <execution_mode>local</execution_mode>
+        <headless>true</headless>
+        <browser>chrome</browser>
+        <thread.count>8</thread.count>
+      </properties>
+    </profile>
+
+    <!-- Remote/Selenoid Execution Profile -->
+    <profile>
+      <id>remote</id>
+      <properties>
+        <execution_mode>remote</execution_mode>
+        <headless>false</headless>
+        <browser>chrome</browser>
+        <remote_url>http://localhost:4444/wd/hub</remote_url>
+        <thread.count>10</thread.count>
+      </properties>
+    </profile>
+
+    <!-- Smoke Tests Profile -->
+    <profile>
+      <id>smoke</id>
+      <properties>
+        <testng.suite.file>testng_smoke.xml</testng.suite.file>
+        <thread.count>2</thread.count>
+      </properties>
+    </profile>
+
+    <!-- Regression Tests Profile -->
+    <profile>
+      <id>regression</id>
+      <properties>
+        <testng.suite.file>testng_regression.xml</testng.suite.file>
+        <thread.count>8</thread.count>
+      </properties>
+    </profile>
+  </profiles>
+</project>

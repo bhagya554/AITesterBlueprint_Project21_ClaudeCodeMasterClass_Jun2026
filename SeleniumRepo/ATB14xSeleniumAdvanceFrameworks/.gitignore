@@ -1,0 +1,106 @@
+# =============================================================================
+# Git Ignore for Selenium Test Automation Framework
+# =============================================================================
+
+# ============================================
+# Build Output
+# ============================================
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+build/
+out/
+*.class
+*.jar
+*.war
+*.ear
+
+# ============================================
+# IDE Files
+# ============================================
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+# ============================================
+# Test Artifacts
+# ============================================
+# Screenshots
+failure_screenshots/
+screenshots/
+
+# Allure Results (generated during test run)
+allure-results/
+allure-report/
+
+# Logs
+logs/
+*.log
+
+# Test Output
+test-output/
+surefire-reports/
+
+# Allure CLI (downloaded by maven plugin)
+.allure/
+
+# ============================================
+# Selenoid
+# ============================================
+selenoid/video/
+selenoid/logs/
+
+# ============================================
+# OS Generated Files
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ============================================
+# Maven
+# ============================================
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# ============================================
+# Environment Files (DO NOT COMMIT SECRETS)
+# ============================================
+.env
+.env.local
+.env.*.local
+*.env
+**/secrets/
+**/credentials/

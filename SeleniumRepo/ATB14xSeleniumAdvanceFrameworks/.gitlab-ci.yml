@@ -1,0 +1,139 @@
+# =============================================================================
+# GitLab CI/CD Pipeline for Selenium Test Automation Framework
+# Supports parallel execution, multiple browsers, and Allure reporting
+# =============================================================================
+
+image: maven:3.9.6-eclipse-temurin-17
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end"
+  BROWSER: "chrome"
+  HEADLESS: "true"
+  EXECUTION_MODE: "local"
+
+# Cache Maven dependencies
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .m2/repository/
+
+stages:
+  - build
+  - test
+  - report
+
+# ===========================================
+# Build Stage - Compile and Download Dependencies
+# ===========================================
+build:
+  stage: build
+  script:
+    - mvn $MAVEN_CLI_OPTS compile
+    - mvn $MAVEN_CLI_OPTS dependency:go-offline
+  artifacts:
+    paths:
+      - target/
+    expire_in: 1 hour
+
+# ===========================================
+# Test Stage - Run Selenium Tests
+# ===========================================
+.test_template: &test_template
+  stage: test
+  before_script:
+    # Install Chrome
+    - apt-get update
+    - apt-get install -y wget gnupg2
+    - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+    - echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
+    - apt-get update
+    - apt-get install -y google-chrome-stable
+    # Install Firefox
+    - apt-get install -y firefox-esr
+  artifacts:
+    when: always
+    paths:
+      - target/surefire-reports/
+      - allure-results/
+      - failure_screenshots/
+      - logs/
+    reports:
+      junit: target/surefire-reports/*.xml
+    expire_in: 7 days
+
+# Chrome Tests
+test:chrome:
+  <<: *test_template
+  variables:
+    BROWSER: "chrome"
+  script:
+    - mvn $MAVEN_CLI_OPTS test -Dbrowser=chrome -Dheadless=true -Dexecution_mode=local
+  allow_failure: true
+
+# Firefox Tests (Optional - uncomment to enable)
+# test:firefox:
+#   <<: *test_template
+#   variables:
+#     BROWSER: "firefox"
+#   script:
+#     - mvn $MAVEN_CLI_OPTS test -Dbrowser=firefox -Dheadless=true -Dexecution_mode=local
+#   allow_failure: true
+
+# Parallel Test Execution (for large test suites)
+test:parallel:
+  <<: *test_template
+  parallel: 3
+  variables:
+    BROWSER: "chrome"
+  script:
+    - mvn $MAVEN_CLI_OPTS test -Dbrowser=chrome -Dheadless=true -Dexecution_mode=local -DforkCount=2
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$RUN_PARALLEL == "true"'
+  allow_failure: true
+
+# ===========================================
+# Report Stage - Generate Allure Report
+# ===========================================
+allure_report:
+  stage: report
+  image: frankescobar/allure-docker-service
+  script:
+    - allure generate allure-results --clean -o allure-report
+  artifacts:
+    paths:
+      - allure-report/
+    expire_in: 30 days
+  when: always
+  dependencies:
+    - test:chrome
+
+# ===========================================
+# Pages - Deploy Allure Report to GitLab Pages
+# ===========================================
+pages:
+  stage: report
+  script:
+    - mkdir -p public
+    - cp -r allure-report/* public/ || true
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
+    - master
+  dependencies:
+    - allure_report
+
+# ===========================================
+# Scheduled Regression Tests (Nightly)
+# ===========================================
+nightly_regression:
+  <<: *test_template
+  script:
+    - mvn $MAVEN_CLI_OPTS test -Dbrowser=chrome -Dheadless=true -Dexecution_mode=local -Dgroups=regression
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+  allow_failure: true
+

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bhagya Kudupudi — QA & Test Automation Engineer</title>
+<meta name="description" content="Bhagya Kudupudi — QA & Test Automation Engineer. Playwright, Selenium, and AI-assisted testing. Building reliable software through meticulous quality engineering." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+<style>
+  /* ============ TOKENS ============ */
+  :root {
+    --ink:        #0d0b08;   /* near-black warm */
+    --ink-2:      #14110c;
+    --paper:      #f4ece0;   /* warm bone */
+    --paper-dim:  #cfc4b4;
+    --muted:      #8c8273;
+    --line:       #2b261d;
+    --gold:       #e0a637;   /* amber accent */
+    --gold-soft:  #f0c86a;
+    --rust:       #c0552b;   /* secondary accent */
+    --glow:       rgba(224,166,55,.16);
+
+    --serif: "Fraunces", Georgia, serif;
+    --body:  "Newsreader", Georgia, serif;
+    --mono:  "Space Mono", ui-monospace, monospace;
+
+    --maxw: 1180px;
+    --ease: cubic-bezier(.18,.72,.22,1);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--body);
+    font-size: clamp(1rem, .9rem + .3vw, 1.18rem);
+    line-height: 1.7;
+    font-weight: 380;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  ::selection { background: var(--gold); color: var(--ink); }
+
+  /* ============ ATMOSPHERE ============ */
+  /* warm gradient mesh */
+  .atmos {
+    position: fixed; inset:0; z-index:-2; pointer-events:none;
+    background:
+      radial-gradient(60vw 60vw at 78% -10%, rgba(224,166,55,.20), transparent 60%),
+      radial-gradient(50vw 50vw at -10% 30%, rgba(192,85,43,.16), transparent 58%),
+      radial-gradient(70vw 70vw at 50% 120%, rgba(224,166,55,.10), transparent 55%),
+      var(--ink);
+  }
+  /* film grain */
+  .grain {
+    position: fixed; inset:-200%; z-index:-1; pointer-events:none; opacity:.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grain 7s steps(6) infinite;
+  }
+  @keyframes grain {
+    0%,100%{transform:translate(0,0)} 20%{transform:translate(-4%,3%)}
+    40%{transform:translate(3%,-2%)} 60%{transform:translate(-2%,4%)} 80%{transform:translate(4%,-3%)}
+  }
+
+  /* ============ LAYOUT ============ */
+  .wrap { max-width: var(--maxw); margin-inline:auto; padding-inline: clamp(1.25rem, 4vw, 3.5rem); }
+  section { position: relative; }
+
+  /* ============ NAV ============ */
+  nav {
+    position: fixed; top:0; left:0; right:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 1rem clamp(1.25rem, 4vw, 3.5rem);
+    backdrop-filter: blur(8px);
+    background: linear-gradient(to bottom, rgba(13,11,8,.7), transparent);
+    transition: background .4s var(--ease), border-color .4s;
+    border-bottom: 1px solid transparent;
+  }
+  nav.scrolled { background: rgba(13,11,8,.82); border-color: var(--line); }
+  .brand {
+    font-family: var(--mono); font-size:.78rem; letter-spacing:.22em;
+    text-transform:uppercase; color: var(--paper-dim);
+    display:flex; align-items:center; gap:.6rem;
+  }
+  .brand .dot { width:7px; height:7px; border-radius:50%; background:var(--gold); box-shadow:0 0 12px var(--gold); }
+  .navlinks { display:flex; gap: clamp(1rem,2.4vw,2.2rem); }
+  .navlinks a {
+    font-family: var(--mono); font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
+    color: var(--muted); text-decoration:none; position:relative; padding:.3rem 0;
+    transition: color .3s;
+  }
+  .navlinks a::after {
+    content:""; position:absolute; left:0; bottom:-2px; height:1px; width:0; background:var(--gold);
+    transition: width .35s var(--ease);
+  }
+  .navlinks a:hover { color: var(--paper); }
+  .navlinks a:hover::after { width:100%; }
+  @media (max-width:640px){ .navlinks{ display:none; } }
+
+  /* ============ HERO ============ */
+  header.hero { min-height: 100svh; display:flex; align-items:center; padding-top:6rem; }
+  .hero-grid {
+    display:grid; grid-template-columns: 1.45fr .85fr; gap: clamp(2rem,5vw,5rem);
+    align-items:center; width:100%;
+  }
+  @media (max-width: 860px){ .hero-grid{ grid-template-columns:1fr; gap:2.5rem; } }
+
+  .eyebrow {
+    font-family: var(--mono); font-size:.74rem; letter-spacing:.32em; text-transform:uppercase;
+    color: var(--gold); display:inline-flex; align-items:center; gap:.9rem; margin-bottom:1.6rem;
+  }
+  .eyebrow::before { content:""; width:42px; height:1px; background:var(--gold); display:inline-block; }
+
+  h1.name {
+    font-family: var(--serif); font-weight:600;
+    font-size: clamp(3.1rem, 9vw, 7.3rem); line-height:.92;
+    letter-spacing:-.02em; font-optical-sizing:auto;
+    margin-bottom: 1.5rem;
+  }
+  h1.name .lh { display:block; }
+  h1.name em {
+    font-style: italic; font-weight:340; color: var(--gold-soft);
+    position:relative;
+  }
+  .lede {
+    max-width: 42ch; color: var(--paper-dim); font-size: clamp(1.05rem,1rem + .4vw,1.3rem);
+    font-weight: 360; margin-bottom: 2.4rem;
+  }
+  .lede strong { color: var(--paper); font-weight:500; }
+
+  .cta-row { display:flex; gap:1rem; flex-wrap:wrap; align-items:center; }
+  .btn {
+    font-family: var(--mono); font-size:.76rem; letter-spacing:.12em; text-transform:uppercase;
+    text-decoration:none; padding:.95rem 1.6rem; border-radius:2px;
+    display:inline-flex; align-items:center; gap:.7rem; transition: all .3s var(--ease);
+  }
+  .btn-solid { background: var(--gold); color: var(--ink); font-weight:700; }
+  .btn-solid:hover { background: var(--gold-soft); transform: translateY(-2px); box-shadow:0 10px 30px var(--glow); }
+  .btn-ghost { color: var(--paper); border:1px solid var(--line); }
+  .btn-ghost:hover { border-color: var(--gold); color: var(--gold-soft); transform: translateY(-2px); }
+  .btn .arr { transition: transform .3s var(--ease); }
+  .btn:hover .arr { transform: translate(3px,-3px); }
+
+  /* portrait */
+  .portrait-col { display:flex; justify-content:center; }
+  .portrait {
+    position:relative; width: clamp(220px, 26vw, 320px); aspect-ratio: 4/5;
+  }
+  .portrait::before {
+    content:""; position:absolute; inset:-14px -14px 18px 18px; border:1px solid var(--gold);
+    border-radius:3px; opacity:.55; z-index:0;
+  }
+  .portrait .frame {
+    position:relative; z-index:1; width:100%; height:100%; border-radius:3px; overflow:hidden;
+    background:
+      linear-gradient(150deg, var(--ink-2), #1c1812);
+    box-shadow: 0 30px 70px rgba(0,0,0,.55);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .portrait .frame img { width:100%; height:100%; object-fit:cover; filter: saturate(.92) contrast(1.02); }
+  .monogram {
+    font-family: var(--serif); font-weight:600; font-size: clamp(4rem,9vw,6rem);
+    color: var(--gold); letter-spacing:-.04em;
+    background: radial-gradient(circle at 40% 30%, rgba(224,166,55,.18), transparent 60%);
+    width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+  }
+  .portrait .tag {
+    position:absolute; z-index:2; bottom:-16px; left:-16px;
+    font-family: var(--mono); font-size:.64rem; letter-spacing:.18em; text-transform:uppercase;
+    background: var(--ink); border:1px solid var(--line); color:var(--paper-dim);
+    padding:.55rem .8rem; border-radius:2px;
+  }
+  .portrait .tag b{ color:var(--gold); }
+
+  /* scrolling marquee strip */
+  .strip {
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    overflow:hidden; white-space:nowrap; padding:.9rem 0; margin-top: clamp(2.5rem,6vh,4rem);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+  .strip .track { display:inline-flex; gap:3rem; animation: slide 28s linear infinite; }
+  .strip span {
+    font-family: var(--serif); font-style:italic; font-size:1.3rem; color: var(--paper-dim);
+    display:inline-flex; align-items:center; gap:3rem;
+  }
+  .strip span::after { content:"✦"; color: var(--gold); font-style:normal; font-size:.8rem; }
+  @keyframes slide { to { transform: translateX(-50%); } }
+
+  /* ============ SECTION HEADINGS ============ */
+  .sec { padding: clamp(4.5rem, 11vh, 8rem) 0; }
+  .sec-head { display:flex; align-items:baseline; gap:1rem; margin-bottom: 3rem; }
+  .sec-num { font-family: var(--mono); font-size:.8rem; color: var(--gold); letter-spacing:.1em; }
+  .sec-title {
+    font-family: var(--serif); font-weight:500; font-size: clamp(1.9rem,4.5vw,3rem);
+    letter-spacing:-.02em; line-height:1;
+  }
+  .sec-rule { flex:1; height:1px; background: linear-gradient(90deg, var(--line), transparent); align-self:center; }
+
+  /* ============ ABOUT ============ */
+  .about-grid { display:grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem,5vw,4rem); }
+  @media (max-width:760px){ .about-grid{ grid-template-columns:1fr; } }
+  .about-lead {
+    font-family: var(--serif); font-weight:340; font-size: clamp(1.4rem,2.6vw,2rem);
+    line-height:1.35; letter-spacing:-.01em;
+  }
+  .about-lead em { font-style:italic; color: var(--gold-soft); }
+  .about-body p { color: var(--paper-dim); margin-bottom:1.2rem; }
+  .about-body p:last-child{ margin-bottom:0; }
+
+  .facts { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1.8rem; }
+  .facts span {
+    font-family:var(--mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase;
+    border:1px solid var(--line); color: var(--paper-dim); padding:.45rem .75rem; border-radius:2px;
+  }
+
+  /* ============ STATS ============ */
+  .stats { display:grid; grid-template-columns: repeat(4,1fr); gap:1rem; margin-top:3.5rem; }
+  @media (max-width:760px){ .stats{ grid-template-columns: repeat(2,1fr); } }
+  .stat { border-top:1px solid var(--gold); padding-top:1rem; }
+  .stat .big { font-family:var(--serif); font-weight:600; font-size: clamp(2rem,5vw,3rem); line-height:1; color:var(--paper); }
+  .stat .lbl { font-family:var(--mono); font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-top:.5rem; }
+
+  /* ============ EXPERTISE ============ */
+  .skills { display:grid; grid-template-columns: repeat(3,1fr); gap:1.1rem; }
+  @media (max-width:860px){ .skills{ grid-template-columns: repeat(2,1fr); } }
+  @media (max-width:520px){ .skills{ grid-template-columns: 1fr; } }
+  .skill {
+    border:1px solid var(--line); border-radius:4px; padding:1.6rem 1.5rem;
+    background: linear-gradient(160deg, rgba(255,255,255,.015), transparent);
+    transition: transform .4s var(--ease), border-color .4s, background .4s;
+    position:relative; overflow:hidden;
+  }
+  .skill::before {
+    content:""; position:absolute; inset:0; background: radial-gradient(40% 60% at 20% 0%, var(--glow), transparent 70%);
+    opacity:0; transition:opacity .4s;
+  }
+  .skill:hover { transform: translateY(-5px); border-color: var(--gold); }
+  .skill:hover::before { opacity:1; }
+  .skill .k { font-family:var(--mono); font-size:.7rem; color:var(--gold); letter-spacing:.1em; }
+  .skill h3 { font-family:var(--serif); font-weight:500; font-size:1.35rem; margin:.6rem 0 .6rem; letter-spacing:-.01em; }
+  .skill p { font-size:.98rem; color:var(--paper-dim); }
+
+  /* ============ WORK ============ */
+  .projects { display:flex; flex-direction:column; }
+  .project {
+    display:grid; grid-template-columns: auto 1fr auto; gap: clamp(1rem,3vw,2.5rem); align-items:center;
+    padding: 1.7rem 0; border-top:1px solid var(--line);
+    text-decoration:none; color:inherit; transition: padding-left .4s var(--ease);
+  }
+  .project:last-child{ border-bottom:1px solid var(--line); }
+  .project:hover { padding-left: clamp(.5rem,2vw,1.5rem); }
+  .project .idx { font-family:var(--mono); font-size:.8rem; color:var(--muted); }
+  .project .meta h3 {
+    font-family:var(--serif); font-weight:500; font-size: clamp(1.3rem,3vw,1.9rem); letter-spacing:-.01em;
+    transition: color .3s; line-height:1.1;
+  }
+  .project:hover .meta h3 { color: var(--gold-soft); }
+  .project .meta p { color: var(--muted); font-size:.95rem; margin-top:.3rem; }
+  .project .stack { font-family:var(--mono); font-size:.66rem; letter-spacing:.08em; text-transform:uppercase; color:var(--paper-dim); text-align:right; }
+  .project .go { font-family:var(--mono); color:var(--gold); transition: transform .3s var(--ease); }
+  .project:hover .go { transform: translate(4px,-4px); }
+  @media (max-width:640px){
+    .project{ grid-template-columns:auto 1fr; }
+    .project .stack{ display:none; }
+  }
+
+  /* ============ CONTACT ============ */
+  .contact { text-align:center; padding: clamp(5rem,13vh,9rem) 0; }
+  .contact .pre { font-family:var(--mono); font-size:.74rem; letter-spacing:.28em; text-transform:uppercase; color:var(--gold); }
+  .contact h2 {
+    font-family:var(--serif); font-weight:500; font-size: clamp(2.4rem,8vw,5.5rem); line-height:1; letter-spacing:-.02em;
+    margin:1.4rem 0 2rem;
+  }
+  .contact h2 a { color:inherit; text-decoration:none; border-bottom:2px solid var(--line); transition: border-color .3s, color .3s; }
+  .contact h2 a:hover { color: var(--gold-soft); border-color: var(--gold); }
+  .socials { display:flex; gap:1.2rem; justify-content:center; flex-wrap:wrap; margin-top:1rem; }
+  .social {
+    font-family:var(--mono); font-size:.74rem; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--paper-dim); text-decoration:none; border:1px solid var(--line); border-radius:2px;
+    padding:.85rem 1.4rem; display:inline-flex; align-items:center; gap:.6rem; transition: all .3s var(--ease);
+  }
+  .social:hover { border-color:var(--gold); color:var(--gold-soft); transform:translateY(-2px); }
+  .social svg { width:16px; height:16px; fill:currentColor; }
+
+  footer {
+    border-top:1px solid var(--line); padding: 2rem 0 3rem;
+    display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+    font-family:var(--mono); font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
+  }
+  footer .dot{ color:var(--gold); }
+
+  /* ============ REVEAL ============ */
+  .reveal { opacity:0; transform: translateY(26px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+  .reveal.in { opacity:1; transform:none; }
+  [data-stagger]{ transition-delay: var(--d,0s); }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; }
+    .reveal{ opacity:1; transform:none; }
+    html{ scroll-behavior:auto; }
+  }
+</style>
+</head>
+<body>
+  <div class="atmos"></div>
+  <div class="grain"></div>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <div class="brand"><span class="dot"></span> BK · Quality Engineering</div>
+    <div class="navlinks">
+      <a href="#about">About</a>
+      <a href="#expertise">Expertise</a>
+      <a href="#work">Work</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow reveal">QA &amp; Test Automation Engineer</span>
+        <h1 class="name reveal" data-stagger style="--d:.05s">
+          <span class="lh">Bhagya</span>
+          <span class="lh"><em>Kudupudi</em></span>
+        </h1>
+        <p class="lede reveal" data-stagger style="--d:.12s">
+          I break software <strong>on purpose</strong> — so it doesn't break on your users.
+          Crafting resilient test automation with <strong>Playwright</strong>,
+          <strong>Selenium</strong>, and AI-assisted quality engineering.
+        </p>
+        <div class="cta-row reveal" data-stagger style="--d:.2s">
+          <a class="btn btn-solid" href="#work">View Work <span class="arr">↗</span></a>
+          <a class="btn btn-ghost" href="#contact">Get in Touch</a>
+        </div>
+      </div>
+
+      <div class="portrait-col reveal" data-stagger style="--d:.16s">
+        <div class="portrait">
+          <div class="frame">
+            <!-- Profile photo; monogram shows as fallback if it fails to load -->
+            <img src="Kudupudi Bhagya Sahitya - Passport Photo 1.jpg" alt="Bhagya Kudupudi"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+            <div class="monogram" style="display:none">BK</div>
+          </div>
+          <span class="tag">Based in <b>India</b> · Open to work</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MARQUEE -->
+  <div class="strip" aria-hidden="true">
+    <div class="track">
+      <span>Playwright</span><span>Selenium</span><span>API Testing</span><span>Page Object Model</span>
+      <span>CI / CD</span><span>AI-Assisted Testing</span><span>TypeScript</span><span>Java</span>
+      <span>Playwright</span><span>Selenium</span><span>API Testing</span><span>Page Object Model</span>
+      <span>CI / CD</span><span>AI-Assisted Testing</span><span>TypeScript</span><span>Java</span>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section class="sec" id="about">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num">01</span>
+        <h2 class="sec-title">About</h2>
+        <span class="sec-rule"></span>
+      </div>
+      <div class="about-grid">
+        <p class="about-lead reveal">
+          I'm a quality engineer who believes the best software is <em>invisible</em> —
+          it just works, every time, for everyone.
+        </p>
+        <div class="about-body reveal" data-stagger style="--d:.1s">
+          <p>
+            My craft lives at the intersection of meticulous testing and modern automation.
+            I design maintainable frameworks, write tests that read like documentation, and
+            chase the flaky edge cases other people skip.
+          </p>
+          <p>
+            Lately I've been exploring how AI accelerates testing — from converting legacy
+            Selenium suites to Playwright, to wiring up local LLMs and MCP servers that help
+            generate, triage, and reason about test coverage.
+          </p>
+          <p>
+            When a build goes green, I want it to <em>mean</em> something.
+          </p>
+          <div class="facts">
+            <span>Test Strategy</span><span>Automation Architecture</span>
+            <span>Regression Suites</span><span>Bug Advocacy</span><span>Continuous Quality</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat reveal" data-stagger style="--d:0s"><div class="big">20+</div><div class="lbl">Projects Shipped</div></div>
+        <div class="stat reveal" data-stagger style="--d:.08s"><div class="big">2</div><div class="lbl">Core Frameworks</div></div>
+        <div class="stat reveal" data-stagger style="--d:.16s"><div class="big">∞</div><div class="lbl">Edge Cases Hunted</div></div>
+        <div class="stat reveal" data-stagger style="--d:.24s"><div class="big">100%</div><div class="lbl">Curiosity</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERTISE -->
+  <section class="sec" id="expertise">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num">02</span>
+        <h2 class="sec-title">Expertise</h2>
+        <span class="sec-rule"></span>
+      </div>
+      <div class="skills">
+        <article class="skill reveal" data-stagger style="--d:0s">
+          <div class="k">// e2e</div>
+          <h3>Playwright</h3>
+          <p>End-to-end suites with the Page Object Model, fixtures, parallel runs, and rock-solid waits across browsers.</p>
+        </article>
+        <article class="skill reveal" data-stagger style="--d:.06s">
+          <div class="k">// legacy</div>
+          <h3>Selenium &amp; Java</h3>
+          <p>Robust POM frameworks, TestNG, and data-driven flows — plus migrating them forward to modern tooling.</p>
+        </article>
+        <article class="skill reveal" data-stagger style="--d:.12s">
+          <div class="k">// services</div>
+          <h3>API Testing</h3>
+          <p>Contract and integration testing for REST &amp; GraphQL with Playwright's request context.</p>
+        </article>
+        <article class="skill reveal" data-stagger style="--d:.18s">
+          <div class="k">// intelligence</div>
+          <h3>AI-Assisted QA</h3>
+          <p>Local LLMs, MCP servers, and Claude Code to generate, convert, and triage tests at speed.</p>
+        </article>
+        <article class="skill reveal" data-stagger style="--d:.24s">
+          <div class="k">// pipeline</div>
+          <h3>CI / CD Quality</h3>
+          <p>Wiring automated suites into pipelines so every commit earns its green checkmark.</p>
+        </article>
+        <article class="skill reveal" data-stagger style="--d:.3s">
+          <div class="k">// language</div>
+          <h3>TypeScript</h3>
+          <p>Typed, readable automation code with utilities and test data that scale with the product.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORK -->
+  <section class="sec" id="work">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num">03</span>
+        <h2 class="sec-title">Selected Work</h2>
+        <span class="sec-rule"></span>
+      </div>
+      <div class="projects">
+        <a class="project reveal" href="https://github.com/bhagya554" target="_blank" rel="noopener">
+          <span class="idx">01</span>
+          <div class="meta">
+            <h3>Selenium → Playwright with a Local LLM</h3>
+            <p>An AI pipeline that converts legacy Selenium suites into modern Playwright tests.</p>
+          </div>
+          <span class="stack">Python · Ollama<br>Playwright</span>
+          <span class="go" aria-hidden="true">↗</span>
+        </a>
+        <a class="project reveal" href="https://github.com/bhagya554" target="_blank" rel="noopener">
+          <span class="idx">02</span>
+          <div class="meta">
+            <h3>MCP × Playwright × JIRA</h3>
+            <p>Model Context Protocol wiring tests, browser automation, and issue tracking together.</p>
+          </div>
+          <span class="stack">MCP · Playwright<br>JIRA</span>
+          <span class="go" aria-hidden="true">↗</span>
+        </a>
+        <a class="project reveal" href="https://github.com/bhagya554" target="_blank" rel="noopener">
+          <span class="idx">03</span>
+          <div class="meta">
+            <h3>Playwright E2E Framework</h3>
+            <p>Page Object Model, reusable fixtures, and data-driven login &amp; regression suites.</p>
+          </div>
+          <span class="stack">TypeScript<br>Playwright</span>
+          <span class="go" aria-hidden="true">↗</span>
+        </a>
+        <a class="project reveal" href="https://github.com/bhagya554" target="_blank" rel="noopener">
+          <span class="idx">04</span>
+          <div class="meta">
+            <h3>Selenium Advanced POM (Java)</h3>
+            <p>A scalable Java automation framework with TestNG and clean architecture.</p>
+          </div>
+          <span class="stack">Java · TestNG<br>Selenium</span>
+          <span class="go" aria-hidden="true">↗</span>
+        </a>
+        <a class="project reveal" href="https://github.com/bhagya554" target="_blank" rel="noopener">
+          <span class="idx">05</span>
+          <div class="meta">
+            <h3>Playwright AI Agents</h3>
+            <p>Exploring autonomous agents that drive browsers and reason about test outcomes.</p>
+          </div>
+          <span class="stack">AI Agents<br>Playwright</span>
+          <span class="go" aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact" id="contact">
+    <div class="wrap reveal">
+      <div class="pre">Let's build something reliable</div>
+      <h2><a href="mailto:kudupudi.bhagya@gmail.com">Say hello&nbsp;↗</a></h2>
+      <div class="socials">
+        <a class="social" href="https://github.com/bhagya554" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.5v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.6.8.5 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5Z"/></svg>
+          GitHub
+        </a>
+        <a class="social" href="https://www.linkedin.com/in/bhagya-kudupudi" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33 0-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.95v5.66H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29ZM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14ZM7.12 20.45H3.55V9h3.57v11.45ZM22.22 0H1.77C.8 0 0 .77 0 1.73v20.54C0 23.22.8 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z"/></svg>
+          LinkedIn
+        </a>
+        <a class="social" href="mailto:kudupudi.bhagya@gmail.com">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4h20a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Zm10 8.2L3.5 6.4V18h17V6.4L12 12.2Zm0-2.3 8-5.5H4l8 5.5Z"/></svg>
+          Email
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="wrap">
+    <span>© <span id="yr"></span> Bhagya Kudupudi</span>
+    <span>Designed &amp; built with care <span class="dot">✦</span> Quality first</span>
+  </footer>
+
+<script>
+  // year
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // nav background on scroll
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 24);
+  onScroll(); window.addEventListener('scroll', onScroll, { passive:true });
+
+  // reveal on scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold:.14, rootMargin:'0px 0px -8% 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // hero reveals fire immediately on load
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.hero .reveal, nav .reveal').forEach(el => el.classList.add('in'));
+  });
+</script>
+</body>
+</html>

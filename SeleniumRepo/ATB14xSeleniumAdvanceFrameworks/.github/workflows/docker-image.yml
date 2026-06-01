@@ -1,0 +1,66 @@
+# =============================================================================
+# Selenium Test Automation Framework - Docker Image
+# Supports Chrome and Firefox browsers for headless test execution
+# =============================================================================
+
+FROM maven:3.9.6-eclipse-temurin-17
+
+LABEL maintainer="The Testing Academy"
+LABEL description="Selenium Test Automation Framework with Java, Maven, Chrome & Firefox"
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV CHROME_VERSION="stable"
+ENV DISPLAY=:99
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg2 \
+    unzip \
+    xvfb \
+    libxi6 \
+    libgconf-2-4 \
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libgtk-3-0 \
+    fonts-liberation \
+    libappindicator3-1 \
+    xdg-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Google Chrome
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Firefox
+RUN apt-get update && apt-get install -y firefox-esr \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install ChromeDriver (auto-managed by Selenium Manager in Selenium 4.6+)
+# No manual installation needed as Selenium Manager handles this
+
+# Create working directory
+WORKDIR /app
+
+# Copy pom.xml first for dependency caching
+COPY pom.xml .
+
+# Download dependencies (cached layer)
+RUN mvn dependency:go-offline -B
+
+# Copy source code
+COPY src ./src
+COPY testng*.xml ./
+
+# Create directories for reports and screenshots
+RUN mkdir -p allure-results failure_screenshots logs
+
+# Set default command to run tests
+ENTRYPOINT ["mvn"]
+CMD ["test", "-Dheadless=true"]
