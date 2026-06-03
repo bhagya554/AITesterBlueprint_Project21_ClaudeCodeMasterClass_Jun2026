@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What we've done so far</title>
+<style>
+  body { font: 16px/1.6 system-ui, -apple-system, Segoe UI, sans-serif;
+         max-width: 820px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
+  h1 { font-size: 1.4rem; border-bottom: 2px solid #eee; padding-bottom: .4rem; }
+  h2 { font-size: 1.1rem; margin-top: 1.6rem; }
+  pre { background: #f6f8fa; padding: 1rem; border-radius: 6px; overflow-x: auto; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #ddd; padding: .5rem .75rem; text-align: left; }
+  th { background: #f6f8fa; }
+  .tag { display:inline-block; background:#e7f3ff; color:#0366d6; border-radius:4px;
+         padding:.1rem .5rem; font-size:.85rem; }
+</style>
+</head>
+<body>
+<h1>What we've done so far</h1>
+<p><span class="tag">session summary</span> &nbsp; 2026-06-01</p>
+
+<h2>Goal</h2>
+<p>Create a skill that triggers whenever you say <strong>"show me"</strong> or
+<strong>"give me"</strong>, and writes the answer to an HTML file in the current
+folder instead of printing it in chat.</p>
+
+<h2>Decisions</h2>
+<table>
+  <tr><th>Question</th><th>Your choice</th></tr>
+  <tr><td>Filename each run</td><td>Unique hashed name (12-char SHA-256 + <code>.html</code>)</td></tr>
+  <tr><td>Chat vs file</td><td>File only — chat reply is just the path</td></tr>
+</table>
+
+<h2>Built</h2>
+<ul>
+  <li>Skill folder: <code>~/.claude/skills/show-me-to-html/</code></li>
+  <li><code>SKILL.md</code> with pushy trigger description, HTML template, hashing logic, two examples</li>
+  <li>Reloaded plugins — skill now live as <code>/show-me-to-html</code></li>
+</ul>
+
+<h2>How it works</h2>
+<ol>
+  <li>You say "show me X" / "give me X"</li>
+  <li>Claude builds the answer</li>
+  <li>Renders self-contained HTML (inline CSS, opens by double-click)</li>
+  <li>Names file from content hash → <code>&lt;hash&gt;.html</code> in current folder</li>
+  <li>Replies in chat with only the path</li>
+</ol>
+
+<h2>This file</h2>
+<p>Proof it works — this very page is the skill running on the request
+"show me whatever we have done so far and open it."</p>
+
+<h2>Next options</h2>
+<ul>
+  <li>Run evals (test prompts + viewer + iterate)</li>
+  <li>Optimize description for trigger accuracy</li>
+  <li>Ship as-is</li>
+</ul>
+</body>
+</html>
